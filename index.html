@@ -1,1 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+        content="TAGSNav: Target-Aware Online 3D Gaussian Splatting and Active Exploration for Instance Image Goal Navigation">
+
+    <title>TAGSNav</title>
+
+    <style>
+        :root {
+            --blue: #2563eb;
+            --dark: #172033;
+            --text: #344054;
+            --light: #f6f8fc;
+            --border: #e4e7ec;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--text);
+            background: white;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.65;
+        }
+
+        .container {
+            width: min(1050px, calc(100% - 36px));
+            margin: 0 auto;
+        }
+
+        .hero {
+            padding: 70px 0 45px;
+            text-align: center;
+            background: linear-gradient(180deg, #f4f7ff, white);
+        }
+
+        .hero h1 {
+            margin: 0 auto 12px;
+            max-width: 1000px;
+            color: var(--dark);
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            line-height: 1.15;
+        }
+
+        .subtitle {
+            max-width: 950px;
+            margin: 0 auto 20px;
+            font-size: 1.35rem;
+            line-height: 1.45;
+        }
+
+        .authors {
+            margin: 18px 0 5px;
+            font-size: 1.05rem;
+        }
+
+        .affiliation {
+            margin: 0;
+            color: #667085;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            background: var(--dark);
+            border-radius: 999px;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background: var(--blue);
+        }
+
+        section {
+            margin: 65px auto;
+        }
+
+        section h2 {
+            margin-bottom: 24px;
+            color: var(--dark);
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .tldr {
+            padding: 18px 22px;
+            background: var(--light);
+            border-left: 4px solid var(--blue);
+            border-radius: 8px;
+            font-size: 1.08rem;
+        }
+
+        .wide-media {
+            display: block;
+            width: 100%;
+            margin: 25px auto 10px;
+            border-radius: 10px;
+        }
+
+        .caption {
+            margin-top: 8px;
+            color: #667085;
+            text-align: center;
+            font-size: 0.94rem;
+        }
+
+        .placeholder {
+            display: grid;
+            min-height: 260px;
+            margin-top: 25px;
+            padding: 30px;
+            place-items: center;
+            color: #667085;
+            background: var(--light);
+            border: 2px dashed #b8c0cc;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
+            gap: 18px;
+            margin-top: 28px;
+        }
+
+        .card {
+            padding: 26px 22px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            color: var(--dark);
+            font-size: 1.3rem;
+            line-height: 1.35;
+        }
+
+        .card p {
+            margin: 0;
+        }
+
+        .card:not(.card-summary) h3 {
+            font-size: 1.125rem;
+        }
+
+        .card-primary {
+            background: #f0f5ff;
+            border-color: #b8cdfa;
+            border-left: 4px solid var(--blue);
+        }
+
+        .card-primary h3 {
+            color: #1d4ed8;
+        }
+
+        .card-summary {
+            grid-column: 1 / -1;
+            background: var(--light);
+        }
+
+        .experiment-figure { margin: 24px 0 32px; }
+        .experiment-figure .wide-media { height: auto; border-radius: 0; }
+        .experiment-heading { margin: 38px 0 12px; color: var(--dark); }
+        .table-scroll { overflow-x: auto; }
+        .ablation-table { width: 100%; min-width: 540px; border-collapse: collapse; text-align: center; font-variant-numeric: tabular-nums; }
+        .ablation-table caption { padding: 0 0 16px; font-weight: 600; color: var(--dark); }
+        .ablation-table th, .ablation-table td { padding: 13px 12px; border-bottom: 1px solid var(--border); }
+        .ablation-table thead { background: var(--light); border-top: 2px solid var(--dark); }
+        .ablation-table th:nth-child(5), .ablation-table td:nth-child(5) { border-left: 1px solid var(--border); }
+        .ablation-table .full-model { background: #f0f5ff; border-top: 2px solid var(--blue); border-bottom: 2px solid var(--dark); }
+        .table-note { font-size: 0.9rem; color: #667085; margin-top: 12px; }
+
+        pre {
+            overflow-x: auto;
+            padding: 20px;
+            color: #e5e7eb;
+            background: #111827;
+            border-radius: 10px;
+            line-height: 1.45;
+        }
+
+        footer {
+            margin-top: 70px;
+            padding: 30px;
+            color: #667085;
+            background: var(--light);
+            text-align: center;
+        }
+
+        @media (max-width: 760px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                margin: 45px auto;
+            }
+
+            section h2 {
+                font-size: 1.6rem;
+            }
+
+            .hero {
+                padding-top: 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="hero">
+        <div class="container">
+
+            <h1>TAGSNav</h1>
+
+            <p class="subtitle">
+                Target-Aware Online 3D Gaussian Splatting and Active
+                Exploration for Instance Image Goal Navigation
+            </p>
+
+            <p class="affiliation">
+            </p>
+
+            <div class="buttons">
+                <a class="button" href="assets/paper/tagsnav.pdf" target="_blank">
+                    Paper
+                </a>
+
+                <a class="button" href="https://github.com/TAGSNav/TAGSNav" target="_blank">
+                    Code
+                </a>
+
+                <a class="button" href="#videos">
+                    Real-World
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section id="overview">
+
+            <p class="tldr">
+                <strong>TL;DR:</strong>
+                TAGSNav couples target-aware online 3D Gaussian Splatting with
+                uncertainty-guided exploration to improve target-region reconstruction
+                under limited observations and computation, enabling reliable instance
+                image goal navigation through viewpoint-aligned matching and re-exploration.
+            </p>
+
+            <figure class="experiment-figure">
+                <a href="assets/images/porter.svg" target="_blank" rel="noopener noreferrer"
+                    aria-label="Open the TAGSNav overview figure at full size">
+                    <img class="wide-media" src="assets/images/porter.svg"
+                        alt="TAGSNav overview: SKGS mapping and SWMI exploration improve rendering quality and support fine localization."
+                        width="1006" height="559" fetchpriority="high">
+                </a>
+            </figure>
+
+        </section>
+
+        <section id="abstract">
+
+            <h2>Abstract</h2>
+
+            <p>
+                Instance Image Goal Navigation (IIN) is a fundamental task in embodied navigation
+                that requires an agent to locate and navigate to a specific object instance in an
+                unknown environment given a reference image. Its core challenge lies in recognizing
+                the same target instance across viewpoints while distinguishing it from visually
+                similar instances of the same category under sparse observations and computational
+                constraints. Most existing methods use 2D semantic maps or scene graphs, with target
+                appearance representations limited to observed viewpoints, restricting instance
+                matching across arbitrary viewpoints. 3D Gaussian Splatting (3DGS) offers a way to
+                overcome this limitation by enabling viewpoint-aligned matching through novel-view
+                rendering. However, optimization-based online 3DGS still struggles to preserve the
+                reconstruction details needed for instance-level discrimination under sparse
+                observations and limited optimization budgets. To this end, we propose TAGSNav,
+                an online IIN framework coupling Incremental Semantic Keyframe-Guided Gaussian
+                Splatting (SKGS) with Gaussian-uncertainty-driven Semantically Weighted Mutual
+                Information (SWMI)-guided exploration in a closed mapping–exploration loop.
+                This loop uses uncertainty to guide observations, improving online reconstruction
+                quality in target-category regions with limited observations and a fixed optimization
+                budget. Building on the resulting maps, coarse-to-fine localization and compensatory
+                re-exploration reduce false and missed matches across arbitrary viewpoints.
+                Viewpoint alignment is additionally performed when needed to verify localization
+                results. On HM3D, it outperforms state-of-the-art methods in SR and SPL;
+                physical-robot deployment without retraining further verifies Sim2Real generalization.
+            </p>
+
+        </section>
+
+        <section id="method">
+
+            <h2>Method Overview</h2>
+
+            <a href="assets/images/framework.svg" target="_blank" rel="noopener noreferrer"
+                aria-label="Open the TAGSNav framework diagram at full size">
+                <img class="wide-media" src="assets/images/framework.svg"
+                    alt="TAGSNav framework showing semantic mapping, SWMI-guided exploration, coarse-to-fine localization, viewpoint alignment, and re-exploration."
+                    width="1079" height="531" loading="lazy" style="height: auto;">
+            </a>
+            <p class="caption">
+                Overview of TAGSNav: the framework comprises a mapping–exploration loop that
+                optimizes Gaussian regions associated with the target category, coarse-to-fine
+                instance localization and viewpoint optimization, and re-exploration.
+                Click the figure to view it at full size.
+            </p>
+
+            <div class="cards">
+
+                <article class="card card-primary">
+                    <h3>Target-Aware Mapping–Exploration Loop</h3>
+
+                    <p>
+                        TAGSNav couples Incremental Semantic Keyframe-Guided Gaussian Splatting
+                        (SKGS) with Semantically Weighted Mutual Information (SWMI)-guided
+                        exploration in a closed mapping–exploration loop. SKGS refines Gaussian
+                        regions associated with the target category using historical observations,
+                        while SWMI uses Gaussian uncertainty to guide the acquisition of informative
+                        observations. Together, they improve target-region reconstruction under
+                        limited observations and a fixed optimization budget.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <h3>Instance Localization and Re-exploration</h3>
+
+                    <p>
+                        Building on the resulting maps, TAGSNav performs coarse-to-fine instance
+                        localization using novel-view renderings, with viewpoint optimization and
+                        alignment applied when needed to verify localization results. Compensatory
+                        re-exploration gathers additional observations of previously seen candidates
+                        when localization fails. These components reduce false and missed matches
+                        across arbitrary viewpoints.
+                    </p>
+                </article>
+
+                <article class="card card-summary">
+                    <h3>Complementary Improvements for IIN</h3>
+
+                    <p>
+                        TAGSNav addresses instance image goal navigation from two complementary
+                        perspectives: the mapping–exploration loop improves the quality of the
+                        target-category 3D representations used for matching, while localization
+                        and re-exploration improve the reliability of the matching process.
+                        Together, these improvements support more reliable target-instance
+                        localization and navigation in unknown environments.
+                    </p>
+                </article>
+
+            </div>
+
+        </section>
+
+        <section id="results">
+
+            <h2>Quantitative Results</h2>
+
+            <figure class="experiment-figure">
+                <a href="assets/images/sr_spl_comparison_vector.svg" target="_blank" rel="noopener noreferrer" aria-label="Open figure at full size">
+                    <img class="wide-media" src="assets/images/sr_spl_comparison_vector.svg" alt="SR and SPL comparison on HM3D-SEM: TAGSNav achieves 71.6% SR and 26.99% SPL." loading="lazy">
+                </a>
+                <figcaption class="caption">SR and SPL comparison with other IIN methods on HM3D-SEM. Higher values indicate better performance. Click the figure to view it at full size.</figcaption>
+            </figure>
+        </section>
+
+        <section id="simulation">
+            <h2>Simulation Results</h2>
+            <figure class="experiment-figure">
+                <a href="assets/images/sim-1.svg" target="_blank" rel="noopener noreferrer" aria-label="Open figure at full size">
+                    <img class="wide-media" src="assets/images/sim-1.svg" alt="Simulated navigation episode and localization examples with large viewpoint differences." loading="lazy">
+                </a>
+                <figcaption class="caption">Top: in-situ 3DGS renderings and the trajectory of a successful navigation episode, without triggering re-exploration. Bottom: localization examples with large viewpoint differences between RGB observations and goal images. Click the figure to view it at full size.</figcaption>
+            </figure>
+        </section>
+
+        <section id="ablation">
+            <h2>Ablation Study</h2>
+            <div class="table-scroll" role="region" aria-label="Ablation results" tabindex="0">
+                <table class="ablation-table">
+                    <caption>Ablation study on HM3D-SEM (100 episodes)</caption>
+                    <thead><tr><th scope="col">SKGS</th><th scope="col">SWMI</th><th scope="col">FL+PVA</th><th scope="col">RE</th><th scope="col">SR (%) &uarr;</th><th scope="col">SPL (%) &uarr;</th></tr></thead>
+                    <tbody>
+                        <tr><td><span aria-label="Module not used">&mdash;</span></td><td><span aria-label="Module not used">&mdash;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td>57</td><td>21.90</td></tr>
+                        <tr><td><span aria-label="Module not used">&mdash;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td>62</td><td>23.52</td></tr>
+                        <tr><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module not used">&mdash;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td>64</td><td>24.12</td></tr>
+                        <tr><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module not used">&mdash;</span></td><td><span aria-label="Module used">&#10003;</span></td><td>64</td><td>26.60</td></tr>
+                        <tr><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module not used">&mdash;</span></td><td>66</td><td>27.13</td></tr>
+                        <tr class="full-model"><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><span aria-label="Module used">&#10003;</span></td><td><strong>71</strong></td><td><strong>28.22</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">&#10003;: module used; &mdash;: module not used.
+                FL+PVA: fine localization with conditional PnP-based viewpoint alignment;
+                RE: re-exploration. &uarr;: larger is better; best results are in <strong>bold</strong>.</p>
+            <h3 class="experiment-heading">Effect of SKGS on Reconstruction</h3>
+            <figure class="experiment-figure">
+                <a href="assets/images/Fig8_skgs_ablation.png" target="_blank" rel="noopener noreferrer" aria-label="Open figure at full size">
+                    <img class="wide-media" src="assets/images/Fig8_skgs_ablation.webp" width="3200" height="1490" alt="Side-by-side target-region renderings comparing the SKGS ablation with full TAGSNav." loading="lazy">
+                </a>
+                <figcaption class="caption">Target-region rendering comparison between TAGSNav without SKGS and the full framework. Click the figure to view it at full size.</figcaption>
+            </figure>
+            <h3 class="experiment-heading">Effect of SWMI on Reconstruction</h3>
+            <figure class="experiment-figure">
+                <a href="assets/images/Fig9_swmi_ablation.png" target="_blank" rel="noopener noreferrer" aria-label="Open figure at full size">
+                    <img class="wide-media" src="assets/images/Fig9_swmi_ablation.webp" width="3200" height="1490" alt="Side-by-side target-region renderings comparing the SWMI ablation with full TAGSNav." loading="lazy">
+                </a>
+                <figcaption class="caption">Target-region rendering comparison between TAGSNav without SWMI and the full framework. Click the figure to view it at full size.</figcaption>
+            </figure>
+        </section>
+
+        <section id="videos">
+            <h2>Real-World Deployment</h2>
+            <p>TAGSNav was deployed on a modified Yuhesen FW-Mid Pro mobile chassis
+                without additional training or fine-tuning.</p>
+            <figure class="experiment-figure">
+                <a href="assets/images/real-2.svg" target="_blank" rel="noopener noreferrer" aria-label="Open figure at full size">
+                    <img class="wide-media" src="assets/images/real-2.svg" alt="Two real-world scenes with image goals, occupancy maps, 3DGS maps, and refined target renderings." loading="lazy">
+                </a>
+                <figcaption class="caption">Real-world deployment in two scenes, showing the target instances, occupancy maps, 3DGS maps, and refined renderings alongside the goal images. Wall signage is blurred for anonymity. Click the figure to view it at full size.</figcaption>
+            </figure>
+        </section>
+
+        <section id="future-work">
+
+            <h2>Future Work</h2>
+
+            <p>
+                Future work will reduce computational latency in mapping, target
+                verification, and localization to better support real-time navigation.
+            </p>
+
+        </section>
+
+        <!-- <section id="citation">
+
+        <h2>Citation</h2>
+
+        <pre><code>@inproceedings{tagsnav,
+    title     = {TAGSNav: Target-Aware Online 3D Gaussian Splatting and
+                 Active Exploration for Instance Image Goal Navigation},
+    author    = {Author names},
+    booktitle = {IEEE International Conference on Robotics and Automation},
+    year      = {Year}
+  }</code></pre>
+
+      </section> -->
+
+    </main>
+
+    <footer>
+        TAGSNav Project Page
+    </footer>
+
+</body>
+
+</html>
