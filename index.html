@@ -435,8 +435,29 @@
         </section>
 
         <section id="videos">
+            <h2>Video</h2>
+            <figure class="experiment-figure">
+                <video class="wide-media" controls playsinline preload="metadata"
+                    poster="assets/video/poster.jpg" width="1920" height="1080"
+                    aria-label="TAGSNav overview and robot navigation demonstrations"
+                    aria-describedby="video-caption">
+                    <source src="assets/video/Video.mp4" type="video/mp4">
+                    Your browser does not support embedded video.
+                    <a href="assets/video/Video.mp4">Download the video</a> to watch it.
+                </video>
+                <figcaption id="video-caption" class="caption">
+                    The video introduces the TAGSNav framework, presents benchmark comparisons and
+                    ablation results on HM3D-SEM, and demonstrates real-world robot navigation
+                    to target objects under varying viewpoints and occlusion levels.
+                    Robot demonstrations are shown at the playback speeds indicated in the video.
+                    Mosaic blurring is applied to conceal identifying information and preserve anonymity.
+                </figcaption>
+            </figure>
+        </section>
+
+        <section id="real-world">
             <h2>Real-World Deployment</h2>
-            <p>TAGSNav was deployed on a modified Yuhesen FW-Mid Pro mobile chassis
+            <p>TAGSNav was deployed on a modified mobile robot platform
                 without additional training or fine-tuning.</p>
             <figure class="experiment-figure">
                 <a href="assets/images/real-2.svg" target="_blank" rel="noopener noreferrer" aria-label="Open figure at full size">
