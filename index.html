@@ -288,28 +288,12 @@
             <h2>Abstract</h2>
 
             <p>
-                Instance Image Goal Navigation (IIN) is a fundamental task in embodied navigation
-                that requires an agent to locate and navigate to a specific object instance in an
-                unknown environment given a reference image. Its core challenge lies in recognizing
-                the same target instance across viewpoints while distinguishing it from visually
-                similar instances of the same category under sparse observations and computational
-                constraints. Most existing methods use 2D semantic maps or scene graphs, with target
-                appearance representations limited to observed viewpoints, restricting instance
-                matching across arbitrary viewpoints. 3D Gaussian Splatting (3DGS) offers a way to
-                overcome this limitation by enabling viewpoint-aligned matching through novel-view
-                rendering. However, optimization-based online 3DGS still struggles to preserve the
-                reconstruction details needed for instance-level discrimination under sparse
-                observations and limited optimization budgets. To this end, we propose TAGSNav,
-                an online IIN framework coupling Incremental Semantic Keyframe-Guided Gaussian
-                Splatting (SKGS) with Gaussian-uncertainty-driven Semantically Weighted Mutual
-                Information (SWMI)-guided exploration in a closed mapping–exploration loop.
-                This loop uses uncertainty to guide observations, improving online reconstruction
-                quality in target-category regions with limited observations and a fixed optimization
-                budget. Building on the resulting maps, coarse-to-fine localization and compensatory
-                re-exploration reduce false and missed matches across arbitrary viewpoints.
-                Viewpoint alignment is additionally performed when needed to verify localization
-                results. On HM3D, it outperforms state-of-the-art methods in SR and SPL;
-                physical-robot deployment without retraining further verifies Sim2Real generalization.
+                Instance ImageGoal Navigation (IIN) is a fundamental embodied navigation task requiring an agent to locate and navigate to a specific object instance in an unknown environment given a reference image. Its core challenge is recognizing the same target instance across viewpoints while distinguishing it from visually similar instances of the same category under sparse observations and computational constraints. Most existing methods rely on 2D semantic maps or scene graphs, with target appearance representations limited to observed viewpoints, restricting instance matching across arbitrary viewpoints. 3D Gaussian Splatting (3DGS) can alleviate this limitation through novel-view rendering for viewpoint-aligned matching. However, optimization-based online 3DGS still struggles to preserve reconstruction details for instance-level discrimination under sparse observations and limited optimization budgets.
+                To this end, we propose TAGSNav, an online IIN
+                framework unifying target-aware online Gaussian mapping and instance verification in a shared scene representation. Its closed mapping–exploration loop couples incremental Semantic Keyframe-Guided Gaussian
+                Splatting (SKGS) mapping for target-region optimization with Gaussian-Uncertainty-Driven Semantically Weighted Mutual Information (SWMI)-guided exploration for informative viewpoint selection, improving online local reconstruction under limited
+                observations and computation. Building on these maps, coarse-to-fine localization conditionally invokes viewpoint alignment. If the target remains unlocalized, compensatory re-exploration revisits candidates; together, they reduce false and missed matches across arbitrary viewpoints. On HM3D-SEM, it outperforms state-of-the-art methods in SR and SPL; physical-robot deployment without retraining further demonstrates
+                Sim2Real generalization.
             </p>
 
         </section>
